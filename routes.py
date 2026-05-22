@@ -23,7 +23,7 @@ def home():
         menu_html += f'''
         <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <div>
-                <h3 style="margin: 0 0 5px 0; color: #1e293b;">{item['name']}</h3>
+                <h3 style="margin: 5px 0 5px 0; color: #1e293b;">{item['name']}</h3>
                 <span style="color: #059669; font-weight: 600; font-size: 1.1rem;">${item['price']:.2f}</span>
             </div>
             <button onclick="placeOrder({item['id']})" style="background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
