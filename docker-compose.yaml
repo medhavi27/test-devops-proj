@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  web-app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://admin:secretpass@menu-db:5432/restaurant_db
+      - PYTHONUNBUFFERED=1  # <--- ADD THIS LINE! Forces Python logs to show instantly
+    depends_on:
+      - menu-db
+
+  menu-db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=secretpass
+      - POSTGRES_DB=restaurant_db
+    ports:
+      - "5432:5432"
