@@ -1,4 +1,5 @@
 flask==3.0.0
 ddtrace==2.8.0
 psycopg2-binary==2.9.9
-datadog-api-client
+datadog==0.50.0
+setuptools
