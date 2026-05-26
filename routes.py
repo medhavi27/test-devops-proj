@@ -120,6 +120,8 @@ def place_order():
         total_cost = price * quantity
         cursor.close()
         conn.close()
+
+        statsd.increment('restaurant.orders', tags=["button:{item}", "env:production"])
         
         return jsonify({
             "status": "success",
