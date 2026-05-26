@@ -1,9 +1,13 @@
 # routes.py
 from flask import Blueprint, jsonify, request
 from database import get_db_connection  # Import our connection helper
+from datadog import statsd
+import time
+
 
 # Create a blueprint named 'api'
 api = Blueprint('api', __name__)
+visit_count = 0
 
 @api.route('/', methods=['GET'])
 def home():
@@ -17,6 +21,10 @@ def home():
         menu_items = [{"id": r[0], "name": r[1], "price": float(r[2])} for r in rows]
     except Exception:
         menu_items = []
+
+    global visit_count
+    visit_count += 1
+    statsd.increment("app.page.visited", tags=["page:home"])
 
     menu_html = ""
     for item in menu_items:
@@ -37,6 +45,7 @@ def home():
     <html lang="en">
     <head><meta charset="UTF-8"><title>DevOps Bites Cafe</title></head>
     <body style="font-family: system-ui, sans-serif; background-color: #f8fafc; margin: 0; padding: 40px 20px;">
+    <h1>Hello from my DevOps app!</h1><p>Visits: {visit_count}</p>
         <div style="max-width: 600px; margin: 0 auto;">
             <header style="text-align: center; margin-bottom: 40px;">
                 <h1 style="color: #0f172a; margin-bottom: 5px;">DevOps Bites Cafe 🍔</h1>
@@ -68,6 +77,9 @@ def home():
     </body>
     </html>
     '''
+
+   
+    
     return html_template
 
 @api.route('/menu', methods=['GET'])
@@ -123,12 +135,18 @@ def place_order():
 
 @api.route('/health-check', methods=['GET'])
 def health_check():
+    statsd.increment("app.health.checked")
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT 1;")
         cursor.close()
         conn.close()
-        return jsonify({"status": "healthy", "database_connected": True}), 200
+        return jsonify({"status": "healthy", "database_connected": True, "timestamp": time.time()}), 200
     except Exception as e:
         return jsonify({"status": "unhealthy", "error": str(e)}), 500
+    
+@api.route("/metrics-test")
+def metrics_test():
+    statsd.increment("app.test_route.hit", tags=["env:dev"])
+    return jsonify({"message": "Metric sent!"})
